@@ -67,6 +67,8 @@ class ModelHandler(object):
         # Do some inference call to engine here and return output
         with torch.no_grad():
             image_features = self.clip_model.encode_image(torch.cat(model_input)).numpy()
+            print("after model")
+            print(image_features.shape)
             expanded_image_features = np.zeros((1024))
             expanded_image_features[:512] = image_features[0]
         return expanded_image_features
@@ -78,7 +80,7 @@ class ModelHandler(object):
         :return: list of predict results
         """
         # Take output from network and post-process to desired format
-        return [np.array2string(inference_output, separator=",", precision=4)]
+        return [str(inference_output.tolist())]
         # prob = np.squeeze(inference_output)
         # a = np.argsort(prob)[::-1]
         # return [["probability=%f, class=%s" % (prob[i], self.labels[i]) for i in a[0:5]]]
