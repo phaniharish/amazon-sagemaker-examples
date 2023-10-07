@@ -7,6 +7,7 @@ from PIL import Image
 import requests
 import clip
 import numpy as np
+import io
 
 
 class ModelHandler(object):
@@ -32,7 +33,7 @@ class ModelHandler(object):
         # model_dir = properties.get("model_dir")
         # gpu_id = properties.get("gpu_id")
         
-        self.clip_model, self.preprocessor = clip.load("ViT-B/32", device="cpu")
+        self.clip_model, self.clip_preprocessor = clip.load("ViT-B/32", device="cpu")
         self.clip_model.requires_grad_(False)
 
     def preprocess(self, request):
@@ -43,17 +44,19 @@ class ModelHandler(object):
         """
         # Take the input data and pre-process it make it inference ready
 
-        img_list = []
+        tensor_list = []
         for idx, data in enumerate(request):
-            # Read the bytearray of the image from the input
-            image_url = data.get("body")
-            # Input image is in bytearray, convert it to MXNet NDArray
-            img = self.preprocess(
-                Image.open(requests.get(image_url.decode("utf-8"), stream=True).raw)
-            ).unsqueeze(0)
-            img_list.append(img)
-
-        return img_list
+            image = data.get("body")
+            print(image.decode())
+            parsed_image = Image.open(requests.get(image.decode(), stream=True).raw)
+            # print(parsed_image)
+            img_pre = self.clip_preprocessor(
+                    parsed_image
+                ).unsqueeze(0)
+            # print(img_pre)
+            print(img_pre.shape)
+        tensor_list.append(img_pre)
+        return tensor_list
 
     def inference(self, model_input):
         """
@@ -75,9 +78,10 @@ class ModelHandler(object):
         :return: list of predict results
         """
         # Take output from network and post-process to desired format
-        prob = np.squeeze(inference_output)
-        a = np.argsort(prob)[::-1]
-        return [["probability=%f, class=%s" % (prob[i], self.labels[i]) for i in a[0:5]]]
+        return np.array2string(inference_output)
+        # prob = np.squeeze(inference_output)
+        # a = np.argsort(prob)[::-1]
+        # return [["probability=%f, class=%s" % (prob[i], self.labels[i]) for i in a[0:5]]]
 
     def handle(self, data, context):
         """
@@ -88,7 +92,8 @@ class ModelHandler(object):
 
         model_input = self.preprocess(data)
         model_out = self.inference(model_input)
-        return model_out
+        result = self.postprocess(model_out)
+        return result
 
 
 _service = ModelHandler()
