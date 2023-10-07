@@ -78,7 +78,7 @@ class ModelHandler(object):
         :return: list of predict results
         """
         # Take output from network and post-process to desired format
-        return np.array2string(inference_output)
+        return [np.array2string(inference_output, separator=",", precision=4)]
         # prob = np.squeeze(inference_output)
         # a = np.argsort(prob)[::-1]
         # return [["probability=%f, class=%s" % (prob[i], self.labels[i]) for i in a[0:5]]]
@@ -92,6 +92,7 @@ class ModelHandler(object):
 
         model_input = self.preprocess(data)
         model_out = self.inference(model_input)
+        print(model_out.shape)
         result = self.postprocess(model_out)
         return result
 
