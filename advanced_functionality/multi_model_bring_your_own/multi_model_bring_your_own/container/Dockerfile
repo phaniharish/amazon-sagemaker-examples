@@ -25,6 +25,7 @@ RUN apt-get -y install --no-install-recommends \
     openjdk-8-jdk-headless \
     curl \
     vim \
+    git \
     && rm -rf /var/lib/apt/lists/* \
     && python --version \
     && curl -O https://bootstrap.pypa.io/get-pip.py \
@@ -37,6 +38,9 @@ RUN update-alternatives --install /usr/local/bin/pip pip /usr/local/bin/pip3 1
 RUN pip3 --no-cache-dir install torch torchvision multi-model-server \
     sagemaker-inference \
     retrying
+RUN pip install ftfy regex tqdm
+RUN pip install git+https://github.com/openai/CLIP.git
+RUN python -c "import clip; clip.load('ViT-B/32', device='cpu')"
 
 # Copy entrypoint script to the image
 COPY dockerd-entrypoint.py /usr/local/bin/dockerd-entrypoint.py
