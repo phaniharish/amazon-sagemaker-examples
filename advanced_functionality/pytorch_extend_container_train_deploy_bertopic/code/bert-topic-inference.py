@@ -33,7 +33,8 @@ def model_fn(model_dir):
     logger.info(f"inside model_fn, model_dir= {model_dir}")
     device = "cuda" if torch.cuda.is_available() else "cpu"
     logger.info("Device Type: {}".format(device))
-    clip_model, clip_preprocessor = clip.load("ViT-B/32", device="cpu")
+    # clip_model, clip_preprocessor = clip.load("ViT-B/32", device="cpu")
+    clip_model, clip_preprocessor = torch.load('/opt/ml/model/model.pth', map_location=torch.device('cpu'))
     clip_model.requires_grad_(False)
     logger.info("Model loaded with Clip")
     return clip_model, clip_preprocessor
