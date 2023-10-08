@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
 # Set a docker label to advertise multi-model support on the container
-LABEL com.amazonaws.sagemaker.capabilities.multi-models=true
+LABEL com.amazonaws.sagemaker.capabilities.multi-models=false
 # Set a docker label to enable container to use SAGEMAKER_BIND_TO_PORT environment variable if present
 LABEL com.amazonaws.sagemaker.capabilities.accept-bind-to-port=true
 
@@ -47,6 +47,7 @@ COPY dockerd-entrypoint.py /usr/local/bin/dockerd-entrypoint.py
 RUN chmod +x /usr/local/bin/dockerd-entrypoint.py
 
 RUN mkdir -p /home/model-server/
+ENV SAGEMAKER_MODEL_SERVER_WORKERS=1
 
 # Copy the default custom service file to handle incoming data and inference requests
 COPY model_handler.py /home/model-server/model_handler.py

@@ -18,7 +18,10 @@
 ARG REGION=us-east-1
 
 # SageMaker PyTorch image for INFERENCE
-FROM 763104351884.dkr.ecr.$REGION.amazonaws.com/pytorch-inference:1.12.1-gpu-py38-cu113-ubuntu20.04-sagemaker
+FROM 763104351884.dkr.ecr.$REGION.amazonaws.com/pytorch-inference:1.8.0-gpu-py3
+RUN pip install ftfy regex tqdm
+RUN pip install git+https://github.com/openai/CLIP.git
+RUN python -c "import clip; clip.load('ViT-B/32', device='cpu')"
 
 ENV PATH="/opt/ml/code:${PATH}"
 
