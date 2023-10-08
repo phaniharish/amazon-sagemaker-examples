@@ -37,6 +37,8 @@ ENV SAGEMAKER_SUBMIT_DIRECTORY /opt/ml/code
 ENV SAGEMAKER_PROGRAM bert-topic-inference.py
 
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir numba==0.53.1 protobuf==3.20.* && pip install --no-cache-dir bertopic==0.12.0 nvgpu smdebug
+    pip install --no-cache-dir numba==0.53.1 protobuf && pip install --no-cache-dir nvgpu smdebug
 
 RUN pip freeze
+
+# ENV SAGEMAKER_MODEL_SERVER_WORKERS=1
