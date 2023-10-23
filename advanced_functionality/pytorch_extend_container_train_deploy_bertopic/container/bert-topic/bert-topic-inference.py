@@ -42,12 +42,12 @@ def model_fn(model_dir):
     return clip_model, clip_preprocessor
 
 
-def predict_fn(data, model):
+def predict_fn(parsed_image, model):
     with torch.no_grad():
-        logger.info(f"Got input Data: {data}")
-        thumbnail_url = data.get("thumbnail_url")
-        logger.info(f"thumbnail_url: {thumbnail_url}")
-        parsed_image = Image.open(requests.get(thumbnail_url, stream=True).raw)
+        # logger.info(f"Got input Data: {data}")
+        # thumbnail_url = data.get("thumbnail_url")
+        # logger.info(f"thumbnail_url: {thumbnail_url}")
+        # parsed_image = Image.open(requests.get(thumbnail_url, stream=True).raw)
         logger.info(f"parsed_image: {parsed_image}")
         img_pre = model[1](parsed_image).unsqueeze(0)
         logger.info(f"img_pre: {img_pre}")
@@ -61,7 +61,11 @@ def input_fn(serialized_input_data, content_type=JSON_CONTENT_TYPE):
     if content_type == JSON_CONTENT_TYPE:
         input_data = json.loads(serialized_input_data)
         logger.info(f"input_data object: {input_data}")
-        return input_data
+        # logger.info(f"Got input Data: {parsed_image}")
+        thumbnail_url = input_data.get("thumbnail_url")
+        logger.info(f"thumbnail_url: {thumbnail_url}")
+        parsed_image = Image.open(requests.get(thumbnail_url, stream=True).raw)
+        return parsed_image
     else:
         raise Exception("Requested unsupported ContentType in Accept: " + content_type)
         return
